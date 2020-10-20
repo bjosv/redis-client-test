@@ -14,6 +14,19 @@ cmake ..
 make
 ```
 
+## hiredis
+
+Simple usage of the lib
+
+### Build
+
+```
+cd hiredis/
+mkdir build
+cd build
+cmake ..
+make
+```
 
 ## Other
 

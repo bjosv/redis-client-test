@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 3.14)
+project(hiredis_usage CXX)
+include(ExternalProject)
+
+# Use debug builds default
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
+endif()
+
+# Download and build dependency: hiredis
+ExternalProject_Add(hiredis_external
+  GIT_REPOSITORY https://github.com/redis/hiredis
+  GIT_TAG "v1.0.0"
+
+  PREFIX            ${CMAKE_CURRENT_BINARY_DIR}
+  BUILD_IN_SOURCE   1
+  INSTALL_COMMAND   ""
+  UPDATE_COMMAND    ""
+)
+add_library(hiredis STATIC SHARED IMPORTED)
+add_dependencies(hiredis hiredis_external)
+set(HIREDIS_SRC_PATH "${CMAKE_CURRENT_BINARY_DIR}/src/hiredis_external/")
+set_target_properties(hiredis PROPERTIES
+  "IMPORTED_LOCATION" "${HIREDIS_SRC_PATH}/libhiredis.so"
+  "INTERFACE_INCLUDE_DIRECTORIES" "${HIREDIS_SRC_PATH}"
+)
+
+# Executable
+add_executable(${PROJECT_NAME} main.cpp)
+add_dependencies(${PROJECT_NAME} hiredis)
+target_link_libraries(${PROJECT_NAME} hiredis)
