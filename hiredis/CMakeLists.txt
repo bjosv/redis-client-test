@@ -11,7 +11,7 @@ endif()
 ExternalProject_Add(hiredis_external
   GIT_REPOSITORY https://github.com/redis/hiredis
   GIT_TAG "v1.0.0"
-
+  CMAKE_ARGS        -DENABLE_SSL=ON
   PREFIX            ${CMAKE_CURRENT_BINARY_DIR}
   BUILD_IN_SOURCE   1
   INSTALL_COMMAND   ""
@@ -25,7 +25,19 @@ set_target_properties(hiredis PROPERTIES
   "INTERFACE_INCLUDE_DIRECTORIES" "${HIREDIS_SRC_PATH}"
 )
 
+add_library(hiredis_ssl STATIC SHARED IMPORTED)
+add_dependencies(hiredis_ssl hiredis_external)
+set_target_properties(hiredis_ssl PROPERTIES
+  "IMPORTED_LOCATION" "${HIREDIS_SRC_PATH}/libhiredis_ssl.so"
+  "INTERFACE_INCLUDE_DIRECTORIES" "${HIREDIS_SRC_PATH}"
+)
+
 # Executable
 add_executable(${PROJECT_NAME} main.cpp)
 add_dependencies(${PROJECT_NAME} hiredis)
 target_link_libraries(${PROJECT_NAME} hiredis)
+
+# Executable
+add_executable(${PROJECT_NAME}_tls main_tls.cpp)
+add_dependencies(${PROJECT_NAME}_tls hiredis)
+target_link_libraries(${PROJECT_NAME}_tls hiredis hiredis_ssl)

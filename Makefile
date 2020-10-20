@@ -5,23 +5,26 @@ REDIS_VER ?= 6.0.8
 DOCKER_CONF = --net=host -v $(shell pwd)/configs/tls:/conf/tls:ro
 
 # Redis cluster - common configs
-REDIS_CONF = --cluster-enabled yes --cluster-node-timeout 5000 --appendonly yes
+REDIS_CLUSTER_CONF = --cluster-enabled yes --cluster-node-timeout 5000 --appendonly yes
 
-# TLS Redis cluster - common configs
-REDIS_TLS_CONF = $(REDIS_CONF) --tls-cluster yes --port 0
+# TLS - common configs
+REDIS_TLS_CONF += --port 0
 REDIS_TLS_CONF += --tls-ca-cert-file /conf/tls/ca.crt
 REDIS_TLS_CONF += --tls-cert-file /conf/tls/redis.crt
 REDIS_TLS_CONF += --tls-key-file /conf/tls/redis.key
 
-start: start-tcp start-tls start-single
+# TLS Redis cluster - common configs
+REDIS_CLUSTER_TLS_CONF = $(REDIS_CLUSTER_CONF) --tls-cluster yes $(REDIS_TLS_CONF)
+
+start: start-tcp start-tls start-single start-single-tls
 
 start-tcp:
-	docker run --name redis-1 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CONF) --port 30001
-	docker run --name redis-2 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CONF) --port 30002
-	docker run --name redis-3 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CONF) --port 30003
-	docker run --name redis-4 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CONF) --port 30004
-	docker run --name redis-5 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CONF) --port 30005
-	docker run --name redis-6 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CONF) --port 30006
+	docker run --name redis-1 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_CONF) --port 30001
+	docker run --name redis-2 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_CONF) --port 30002
+	docker run --name redis-3 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_CONF) --port 30003
+	docker run --name redis-4 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_CONF) --port 30004
+	docker run --name redis-5 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_CONF) --port 30005
+	docker run --name redis-6 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_CONF) --port 30006
 	sleep 5
 	echo 'yes' | docker run --name redis-cluster -i --rm $(DOCKER_CONF) redis:$(REDIS_VER) \
 	redis-cli --cluster create \
@@ -29,12 +32,12 @@ start-tcp:
 	--cluster-replicas 1
 
 start-tls:
-	docker run --name redis-tls-1 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_TLS_CONF) --tls-port 31001
-	docker run --name redis-tls-2 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_TLS_CONF) --tls-port 31002
-	docker run --name redis-tls-3 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_TLS_CONF) --tls-port 31003
-	docker run --name redis-tls-4 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_TLS_CONF) --tls-port 31004
-	docker run --name redis-tls-5 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_TLS_CONF) --tls-port 31005
-	docker run --name redis-tls-6 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_TLS_CONF) --tls-port 31006
+	docker run --name redis-tls-1 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_TLS_CONF) --tls-port 31001
+	docker run --name redis-tls-2 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_TLS_CONF) --tls-port 31002
+	docker run --name redis-tls-3 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_TLS_CONF) --tls-port 31003
+	docker run --name redis-tls-4 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_TLS_CONF) --tls-port 31004
+	docker run --name redis-tls-5 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_TLS_CONF) --tls-port 31005
+	docker run --name redis-tls-6 -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_CLUSTER_TLS_CONF) --tls-port 31006
 	sleep 7
 	echo 'yes' | docker run --name redis-cluster -i --rm $(DOCKER_CONF) redis:$(REDIS_VER) \
 	redis-cli --cluster create \
@@ -45,10 +48,13 @@ start-tls:
 start-single:
 	docker run --name redis-single -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server --port 32001
 
+start-single-tls:
+	docker run --name redis-single-tls -d $(DOCKER_CONF) redis:$(REDIS_VER) redis-server $(REDIS_TLS_CONF) --tls-port 33001
+
 stop:
 	-docker rm -f redis-1 redis-2 redis-3 redis-4 redis-5 redis-6
 	-docker rm -f redis-tls-1 redis-tls-2 redis-tls-3 redis-tls-4 redis-tls-5 redis-tls-6
-	-docker rm -f redis-single
+	-docker rm -f redis-single redis-single-tls
 
 status: status-tcp status-tls
 
