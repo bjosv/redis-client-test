@@ -1,5 +1,11 @@
 # Redis client test
 
+Prepare:
+
+```
+sudo apt install libevent-dev
+```
+
 ## hiredis-vip
 
 Simple usage of the lib
