@@ -7,6 +7,9 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
 endif()
 
+# Handle libevent
+find_library(EVENT_LIBRARY event HINTS /usr/lib/x86_64-linux-gnu)
+
 # Download and build dependency: hiredis
 ExternalProject_Add(hiredis_external
   GIT_REPOSITORY  https://github.com/redis/hiredis
@@ -46,8 +49,11 @@ add_dependencies(${PROJECT_NAME}_tls hiredis)
 target_link_libraries(${PROJECT_NAME}_tls hiredis hiredis_ssl)
 
 # Executable: async
-find_library(EVENT_LIBRARY event HINTS /usr/lib/x86_64-linux-gnu)
-
 add_executable(${PROJECT_NAME}_async main_async.cpp)
 add_dependencies(${PROJECT_NAME}_async hiredis)
 target_link_libraries(${PROJECT_NAME}_async hiredis ${EVENT_LIBRARY})
+
+# Executable: async and tls/ssl
+add_executable(${PROJECT_NAME}_tls_async main_tls_async.cpp)
+add_dependencies(${PROJECT_NAME}_tls_async hiredis)
+target_link_libraries(${PROJECT_NAME}_tls_async hiredis hiredis_ssl ${EVENT_LIBRARY})

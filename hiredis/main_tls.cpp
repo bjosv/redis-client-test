@@ -23,15 +23,15 @@ int main(int argc, char** argv)
     printf("Current path: %s\n", cwd);
 
     char cert[PATH_MAX];
-    strcat(cert, cwd);
+    strcpy(cert, cwd);
     strcat(cert, "/../../configs/tls/redis.crt");
     printf("Cert: %s\n", cert);
     char key[PATH_MAX];
-    strcat(key, cwd);
+    strcpy(key, cwd);
     strcat(key, "/../../configs/tls/redis.key");
     printf("Key: %s\n", key);
     char ca[PATH_MAX];
-    strcat(ca, cwd);
+    strcpy(ca, cwd);
     strcat(ca, "/../../configs/tls/ca.crt");
     printf("Ca: %s\n", ca);
 
