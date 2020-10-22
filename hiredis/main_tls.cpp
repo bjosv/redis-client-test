@@ -1,16 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "hiredis.h"
-#include "hiredis_ssl.h"
-
 #include <unistd.h>
 #include <limits.h>
 #include <string.h>
+#include "hiredis.h"
+#include "hiredis_ssl.h"
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    redisContext* c;
-    redisSSLContext* ssl;
+    redisContext *c;
+    redisSSLContext *ssl;
     redisSSLContextError ssl_error;
     struct timeval timeout = { 1, 500000 }; // 1.5s
 
@@ -64,15 +63,14 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    redisReply* reply = (redisReply*)redisCommand(c,"SET %s %s", "key", "value");
+    redisReply *reply = (redisReply*)redisCommand(c,"SET %s %s", "key", "value");
     printf("SET: %s\n", reply->str);
     freeReplyObject(reply);
 
-    redisReply* reply2 = (redisReply*)redisCommand(c, "GET %s", "key");
+    redisReply *reply2 = (redisReply*)redisCommand(c, "GET %s", "key");
     printf("GET: %s\n", reply2->str);
     freeReplyObject(reply2);
 
-    /* Disconnects and frees the context */
     redisFree(c);
     redisFreeSSLContext(ssl);
     return 0;

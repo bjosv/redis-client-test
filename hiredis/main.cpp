@@ -17,7 +17,6 @@ int main(int argc, char **argv)
     printf("GET: %s\n", reply2->str);
     freeReplyObject(reply2);
 
-    /* Disconnects and frees the context */
     redisFree(c);
     return 0;
 }

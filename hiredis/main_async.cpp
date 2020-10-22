@@ -3,8 +3,8 @@
 #include "hiredis.h"
 #include "adapters/libevent.h"
 
-void getCallback(redisAsyncContext* c, void* r, void* privdata) {
-    redisReply* reply = (redisReply*)r;
+void getCallback(redisAsyncContext *c, void *r, void *privdata) {
+    redisReply *reply = (redisReply*)r;
     if (reply == NULL) {
         if (c->errstr) {
             printf("errstr: %s\n", c->errstr);
@@ -17,7 +17,7 @@ void getCallback(redisAsyncContext* c, void* r, void* privdata) {
     redisAsyncDisconnect(c);
 }
 
-void connectCallback(const redisAsyncContext* c, int status) {
+void connectCallback(const redisAsyncContext *c, int status) {
     if (status != REDIS_OK) {
         printf("Error: %s\n", c->errstr);
         return;
@@ -25,7 +25,7 @@ void connectCallback(const redisAsyncContext* c, int status) {
     printf("Connected...\n");
 }
 
-void disconnectCallback(const redisAsyncContext* c, int status) {
+void disconnectCallback(const redisAsyncContext *c, int status) {
     if (status != REDIS_OK) {
         printf("Error: %s\n", c->errstr);
         return;
@@ -40,13 +40,13 @@ int main(int argc, char **argv)
     struct timeval timeout = { 1, 500000 }; // 1.5s
     options.connect_timeout = &timeout;
 
-    redisAsyncContext* c = redisAsyncConnectWithOptions(&options);
+    redisAsyncContext *c = redisAsyncConnectWithOptions(&options);
     if (c->err) {
         printf("Error: %s\n", c->errstr);
-        return 1;
+        exit(1);
     }
 
-    struct event_base* base = event_base_new();
+    struct event_base *base = event_base_new();
     redisLibeventAttach(c, base);
     redisAsyncSetConnectCallback(c, connectCallback);
     redisAsyncSetDisconnectCallback(c, disconnectCallback);
@@ -56,5 +56,7 @@ int main(int argc, char **argv)
     redisAsyncCommand(c, getCallback, (char*)"THE_ID", "GET %s", "key");
 
     event_base_dispatch(base);
+
+    event_base_free(base);
     return 0;
 }
