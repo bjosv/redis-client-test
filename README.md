@@ -1,28 +1,26 @@
 # Redis client test
 
+A couple of simple testprograms that uses some existing Redis client libraries in C.
+Each folder covers a single client library, and CMake is used to download needed
+libraries and to build the test programs.
+
 Prepare:
 
 ```
+# Install: cmake, gcc/clang (valgrind)
+
+# Needed for async behaviour
 sudo apt install libevent-dev
-```
 
-## hiredis-vip
+# Start Redis clusters/instances
+make start
 
-Simple usage of the lib
-
-### Build
-
-```
-cd hiredis-vip/
-mkdir build
-cd build
-cmake ..
-make
+(use `make stop` to stop them again later)
 ```
 
 ## hiredis
 
-Simple usage of the lib
+Simple usage of the official library.
 
 ### Build
 
@@ -34,16 +32,48 @@ cmake ..
 make
 ```
 
-## Other
+## hiredis-vip
 
-Get RPATH
+Simple usage of the library supporting Redis Cluster
+This library is built on top of an older hiredis.
 
-```
-readelf -d ~/git/redis-client-test/hiredis-vip/build/hiredis_vip_usage | head -20
-```
-
-Get SONAME
+### Build
 
 ```
-objdump -p ~/git/redis-client-test/hiredis-vip/build/src/hiredis_vip_external/libhiredis_vip.so | grep SONAME
+cd hiredis-vip/
+mkdir build
+cd build
+cmake ..
+make
 ```
+
+## hiredis-vip (heronr fork)
+
+Simple usage of the library supporting Redis Cluster.
+This library links to an official hiredis.
+
+### Build
+
+```
+cd hiredis-vip-heronr/
+mkdir build
+cd build
+cmake ..
+make
+```
+
+### Findings
+
+Problems found in the hiredis fork:
+
+* Include path errors:
+  sed -i s/adapaters/adapters/ ${CMAKE_BINARY_DIR}/src/hiredis_vip_external/adapters/libevent.h
+* Spelling: witch
+  static cluster_node *node_get_witch_connected(redisClusterContext *cc)
+* Leak: Iterator not released
+  void redisClusterAsyncDisconnect(redisClusterAsyncContext *acc)
+* Faulty pointer
+  static void unlinkAsyncContextAndNode(redisAsyncContext* ac)
+  -->
+  static void unlinkAsyncContextAndNode(void *data)
+        node = (cluster_node *)(data);

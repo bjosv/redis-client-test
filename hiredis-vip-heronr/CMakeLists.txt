@@ -21,6 +21,7 @@ ExternalProject_Add(hiredis_external
   PREFIX          ${CMAKE_CURRENT_BINARY_DIR}
   CMAKE_ARGS      "-DENABLE_SSL=ON"
                   "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+                  "-DCMAKE_BUILD_TYPE=Debug"
 )
 
 # Define lib: hiredis
@@ -41,13 +42,18 @@ set_target_properties(hiredis_ssl PROPERTIES
 
 # Download and install: hiredis-vip
 ExternalProject_Add(hiredis_vip_external
-  GIT_REPOSITORY    https://github.com/heronr/hiredis-vip
-  GIT_TAG           origin/master
+  # GIT_REPOSITORY    https://github.com/heronr/hiredis-vip
+  # GIT_TAG           origin/master
+  GIT_REPOSITORY    https://github.com/bjosv/hiredis-vip
+  GIT_TAG           origin/heronr_corrections
   PREFIX            ${CMAKE_CURRENT_BINARY_DIR}
   CMAKE_ARGS        "-DCMAKE_PREFIX_PATH=${INSTALL_DIR}"
                     "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+                    "-DCMAKE_BUILD_TYPE=Debug"
   BUILD_IN_SOURCE   1
   DEPENDS           hiredis
+
+  PATCH_COMMAND     sed -i s/adapaters/adapters/ ${CMAKE_BINARY_DIR}/src/hiredis_vip_external/adapters/libevent.h
 )
 
 # Define lib: hiredis_vip
@@ -62,3 +68,8 @@ set_target_properties(hiredis_vip PROPERTIES
 add_executable(${PROJECT_NAME} main.cpp)
 add_dependencies(${PROJECT_NAME} hiredis_vip hiredis)
 target_link_libraries(${PROJECT_NAME} hiredis_vip hiredis)
+
+# Executable: async
+add_executable(${PROJECT_NAME}_async main_async.cpp)
+add_dependencies(${PROJECT_NAME}_async hiredis_vip)
+target_link_libraries(${PROJECT_NAME}_async hiredis hiredis_vip ${EVENT_LIBRARY})
