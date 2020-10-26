@@ -52,8 +52,6 @@ ExternalProject_Add(hiredis_vip_external
                     "-DCMAKE_BUILD_TYPE=Debug"
   BUILD_IN_SOURCE   1
   DEPENDS           hiredis
-
-  PATCH_COMMAND     sed -i s/adapaters/adapters/ ${CMAKE_BINARY_DIR}/src/hiredis_vip_external/adapters/libevent.h
 )
 
 # Define lib: hiredis_vip
