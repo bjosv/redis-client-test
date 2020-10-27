@@ -55,6 +55,7 @@ Problems found in the hiredis-vip:
   int redisClusterSetOptionAddNode(redisClusterContext *cc, const char *addr)
   Using `:` to split address and port, wont work in IPv6
 
+
 ## hiredis-vip (heronr fork)
 
 Simple usage of the library supporting Redis Cluster.
@@ -72,7 +73,11 @@ make
 
 ### Findings
 
-Problems found in the hiredis fork:
+Problems found in the hiredis-vip heronr fork:
+
+* Not supporting IPv6
+  int redisClusterSetOptionAddNode(redisClusterContext *cc, const char *addr)
+  Using `:` to split address and port, wont work in IPv6
 
 * Include path errors:
   sed -i s/adapaters/adapters/ ${CMAKE_BINARY_DIR}/src/hiredis_vip_external/adapters/libevent.h

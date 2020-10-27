@@ -62,10 +62,15 @@ set_target_properties(hiredis_vip PROPERTIES
   "INTERFACE_INCLUDE_DIRECTORIES" "${INSTALL_DIR}/include"
 )
 
-# Executable
+# Executable: IPv4
 add_executable(${PROJECT_NAME} main.cpp)
 add_dependencies(${PROJECT_NAME} hiredis_vip hiredis)
 target_link_libraries(${PROJECT_NAME} hiredis_vip hiredis)
+
+# Executable: IPv6
+add_executable(${PROJECT_NAME}_ipv6 main_ipv6.cpp)
+add_dependencies(${PROJECT_NAME}_ipv6 hiredis_vip hiredis)
+target_link_libraries(${PROJECT_NAME}_ipv6 hiredis_vip hiredis)
 
 # Executable: async
 add_executable(${PROJECT_NAME}_async main_async.cpp)
