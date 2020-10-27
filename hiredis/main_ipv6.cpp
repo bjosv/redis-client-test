@@ -7,7 +7,7 @@ int main(int argc, char **argv)
     redisContext *c;
     struct timeval timeout = { 1, 500000 }; // 1.5s
 
-    c = redisConnectWithTimeout("127.0.0.1", 32001, timeout);
+    c = redisConnectWithTimeout("::1", 32001, timeout);
 
     redisReply* reply = (redisReply*)redisCommand(c, "SET %s %s", "key", "value");
     printf("SET: %s\n", reply->str);

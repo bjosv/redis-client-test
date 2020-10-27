@@ -38,10 +38,15 @@ set_target_properties(hiredis_ssl PROPERTIES
   "INTERFACE_INCLUDE_DIRECTORIES" "${HIREDIS_SRC_PATH}"
 )
 
-# Executable
+# Executable: IPv4
 add_executable(${PROJECT_NAME} main.cpp)
 add_dependencies(${PROJECT_NAME} hiredis)
 target_link_libraries(${PROJECT_NAME} hiredis)
+
+# Executable: IPv6
+add_executable(${PROJECT_NAME}_ipv6 main_ipv6.cpp)
+add_dependencies(${PROJECT_NAME}_ipv6 hiredis)
+target_link_libraries(${PROJECT_NAME}_ipv6 hiredis)
 
 # Executable: tls/ssl
 add_executable(${PROJECT_NAME}_tls main_tls.cpp)
