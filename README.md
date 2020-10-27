@@ -77,3 +77,16 @@ Problems found in the hiredis fork:
   -->
   static void unlinkAsyncContextAndNode(void *data)
         node = (cluster_node *)(data);
+* Spelling
+  - redisCLusterSendAll
+  - redisCLusterClearAll
+* Unused functions
+  - static void print_cluster_node_list(redisClusterContext *cc)
+  - static cluster_node *node_get_by_slot(redisClusterContext *cc, uint32_t slot_num)
+
+
+## Checkers
+
+```
+docker run -t -v $(pwd):/src neszt/cppcheck-docker
+```
