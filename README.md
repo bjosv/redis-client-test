@@ -47,6 +47,14 @@ cmake ..
 make
 ```
 
+### Findings
+
+Problems found in the hiredis-vip:
+
+* Not supporting IPv6
+  int redisClusterSetOptionAddNode(redisClusterContext *cc, const char *addr)
+  Using `:` to split address and port, wont work in IPv6
+
 ## hiredis-vip (heronr fork)
 
 Simple usage of the library supporting Redis Cluster.

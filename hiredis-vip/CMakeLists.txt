@@ -7,6 +7,8 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
 endif()
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Handle libevent
 find_library(EVENT_LIBRARY event HINTS /usr/lib/x86_64-linux-gnu)
 
@@ -33,10 +35,15 @@ set_target_properties(hiredis_vip PROPERTIES
   "INTERFACE_INCLUDE_DIRECTORIES" "${HIREDIS_VIP_SRC_PATH}"
 )
 
-# Executable
+# Executable: IPv4
 add_executable(${PROJECT_NAME} main.cpp)
 add_dependencies(${PROJECT_NAME} hiredis_vip)
 target_link_libraries(${PROJECT_NAME} hiredis_vip)
+
+# Executable: IPv6
+add_executable(${PROJECT_NAME}_ipv6 main_ipv6.cpp)
+add_dependencies(${PROJECT_NAME}_ipv6 hiredis_vip)
+target_link_libraries(${PROJECT_NAME}_ipv6 hiredis_vip)
 
 # Executable: async
 add_executable(${PROJECT_NAME}_async main_async.cpp)
